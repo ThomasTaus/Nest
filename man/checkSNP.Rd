@@ -38,7 +38,7 @@ A logical vector indicating which SNPs are suited for Ne estimation.
 %% ~put references to the literature/web site here ~
 }
 \author{
-%%  ~~who you are~~
+Thomas Taus
 }
 \note{
 %%  ~~further notes~~

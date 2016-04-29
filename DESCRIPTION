@@ -1,10 +1,10 @@
 Package: Nest
 Type: Package
-Title: What the package does (short line)
+Title: Simulate allele frequency trajectories and estimate effective population size 
 Version: 1.1.3
 Date: 2016-03-10
-Author: Who wrote it
-Maintainer: Who to complain to <yourfault@somewhere.net>
-Description: More about what it does (maybe more than one line)
-License: What license is it under?
+Author: Thomas Taus
+Maintainer: Thomas Taus <Thomas.Taus@vetmeduni.ac.at>
+Description: Simulate your own allele frequency time series data, load allele counts into R and estimate the effective population size with different methods.
+License: MIT License
 Depends: R (>= 3.2.0), data.table (>= 1.9.4), foreach (>= 1.4.2), stringi (>= 0.4-1), matrixStats (>= 0.14.2)

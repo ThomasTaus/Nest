@@ -37,7 +37,7 @@ A list containing the following items:
 %% ~put references to the literature/web site here ~
 }
 \author{
-%%  ~~who you are~~
+Thomas Taus
 }
 \note{
 %%  ~~further notes~~

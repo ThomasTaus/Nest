@@ -66,10 +66,10 @@ MISSING
   \item{SNPs}{number of SNPs within the window}
 }
 \references{
-%% ~put references to the literature/web site here ~
+Jonas, A., Taus, T., Kosiol, C., Schlötterer, C. & Futschik, A.: Estimating effective population size from temporal allele frequency changes in experimental evolution, manuscript in preparation
 }
 \author{
-%%  ~~who you are~~
+Thomas Taus
 }
 \note{
 %%  ~~further notes~~

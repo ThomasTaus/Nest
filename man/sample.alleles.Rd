@@ -40,7 +40,7 @@ A numeric vector of allele frequencies or (if \code{mode = "coverage"} and \code
 %% ~put references to the literature/web site here ~
 }
 \author{
-%%  ~~who you are~~
+Thomas Taus
 }
 \note{
 %%  ~~further notes~~

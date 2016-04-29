@@ -53,10 +53,10 @@ MISSING
 \code{estimateNe} returns either a named vector (default) or a list (if \code{asList = TRUE}) containing estimates of Ne applying all the different method(s) specified in \code{method}.
 }
 \references{
-%% ~put references to the literature/web site here ~
+Jonas, A., Taus, T., Kosiol, C., Schlötterer, C. & Futschik, A.: Estimating effective population size from temporal allele frequency changes in experimental evolution, manuscript in preparation
 }
 \author{
-%%  ~~who you are~~
+Thomas Taus & Agnes Jonas
 }
 \note{
 %%  ~~further notes~~

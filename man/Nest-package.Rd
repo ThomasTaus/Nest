@@ -17,7 +17,7 @@ The \code{Nest} package allows you to simulate allele frequency trajectories und
 Maintainer: \packageMaintainer{Nest}
 }
 \references{
-~~ Literature or other references for background information ~~
+Jonas, A., Taus, T., Kosiol, C., Schlötterer, C. & Futschik, A.: Estimating effective population size from temporal allele frequency changes in experimental evolution, manuscript in preparation
 }
 \keyword{ package }
 \seealso{

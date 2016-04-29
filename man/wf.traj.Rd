@@ -42,7 +42,7 @@ If a custom function is specified in \code{startAF} it might be necessary to exp
 %% ~put references to the literature/web site here ~
 }
 \author{
-%%  ~~who you are~~
+Thomas Taus
 }
 \note{
 %%  ~~further notes~~
