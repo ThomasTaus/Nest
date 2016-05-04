@@ -8,12 +8,15 @@ library(matrixStats)
 # Simulate allele frequency trajectories -
 #-----------------------------------------
 
-wf.traj <- function(p0, Ne, t, s=0, h=0.5) {
+wf.traj <- function(p0, Ne, t, s=0, h=0.5, haploid=FALSE) {
   
   # initialize trajectory matrix
   traj <- matrix(NA, ncol=length(t), nrow=max(length(p0), length(s), length(h)), dimnames=list(c(), paste0("F", t)))
   if(0 %in% t)
     traj[,"F0"] <- p0
+  
+  if(!haploid)
+    Ne <- 2*Ne
   
   g <- 1
   p <- p0
@@ -21,10 +24,14 @@ wf.traj <- function(p0, Ne, t, s=0, h=0.5) {
   wAA <- 1+s
   wAa <- 1+h*s
   waa <- 1
+  
   # simulate allele frequencies across time
   while(g <= max(t)) {
+    # compute mean fitness
+    w <- if(haploid) p*wAA + q*waa else p^2*wAA + 2*p*q*wAa + q^2*waa
+    
     # apply selection and random drift
-    p <- (wAA*p^2 + wAa*p*q) / (wAA*p^2 + wAa*2*p*q + waa*q^2)
+    p <- if(haploid) p*wAA/w else (wAA*p^2 + wAa*p*q)/w
     if(!is.na(Ne))
       p <- rbinom(length(p), Ne, p) / Ne
     q <- 1-p
@@ -60,7 +67,7 @@ sample.alleles <- function(p, size, mode=c("coverage", "individuals"), Ncensus=N
                   # sample allele frequencies from Binomial distribution based on 'cov' and 'p'
                   p.smpld <- rbinom(n=maxlen, size=cov, prob=p) / cov
                   # return results, including coverage values if they were drawn from a Poisson distribution
-                  if(length(size) == 1) list(p.smpld=p.smpld, size=cov) else p.smpld
+                  if(length(size) == 1) data.table(p.smpld=p.smpld, size=cov) else p.smpld
                 },
                 individuals={
                   # if length of 'size' is larger than 1, then send warning message
@@ -68,7 +75,7 @@ sample.alleles <- function(p, size, mode=c("coverage", "individuals"), Ncensus=N
                     warning("Only the first element in 'size' will be used, because sampling mode is 'individuals'")
                   
                   # sample random allele frequencies from Hypergeometric distribution
-                  rhyper(nn=maxlen, m=p*census, n=(1-p)*census, k=size[1]*ploidy)
+                  rhyper(nn=maxlen, m=p*Ncensus*ploidy, n=(1-p)*Ncensus*ploidy, k=size[1]*ploidy)/(size[1]*ploidy)
                 }))
 }
 
@@ -177,14 +184,18 @@ read.sync <- function(file, gen, repl, rising=FALSE) {
 #--------------------------------------
 
 checkSNP <- function(p0, pt, cov0, covt, truncAF=NA) {
-  # return false if any of the following conditions is met xi=yi, xi=0, xi=1, (xi+yi)/2=0, (xi+yi)/2=1
-  return(p0 != pt & p0 != 0 & p0 != 1 & (p0+pt)/2 != 0 & (p0+pt)/2 != 1 & cov0 != 0 & covt != 0 & if(is.na(truncAF)) TRUE else p0 >= truncAF & p0 <= 1-truncAF) #& pt != 0 & pt != 1
+  # return false if any of the following conditions is met xi==yi, xi==0, xi==1, (xi+yi)/2==0, (xi+yi)/2==1
+  # return for extreme allele frequencies if truncAF is unequal to 'NA'
+  return(p0 != pt & p0 != 0 & p0 != 1 & cov0 != 0 & covt != 0 & if(is.na(truncAF)) TRUE else p0 >= truncAF & p0 <= 1-truncAF)
 }
 
-estimateNe <- function(p0, pt, cov0, covt, t, ploidy=2, truncAF=NA, method="P_AF2_planI", poolSize=NA, Ncensus=NA, asList=FALSE) { 
+estimateNe <- function(p0, pt, cov0, covt, t, ploidy=2, truncAF=NA, method="P.planI", poolSize=NA, Ncensus=NA, asList=FALSE) { 
   
   # check if parameter 'method' has been set properly - stop execution otherwise
-  mm <- match.arg(method, choices=c("P_AF", "P_AF2_planI", "P_AF2_planII", "P_AJ_planI", "P_AJ_planII", "JR_planI", "JR_planII", "W_planI", "W_planII"), several.ok=TRUE)
+  mm <- match.arg(method, choices=c("P.planI", "P.planII",
+                                    "JR.planI", "JR.planII",
+                                    "W.planI", "W.planII",
+                                    "P.alt.1step.planII", "P.alt.2step.planI", "P.alt.2step.planII"), several.ok=TRUE)
   if(length(mm) != length(method))
     stop("Unable to resolve the following method(s): ", paste("'", method[!method %in% mm], "'", sep="", collapse=", "))
   else
@@ -208,96 +219,79 @@ estimateNe <- function(p0, pt, cov0, covt, t, ploidy=2, truncAF=NA, method="P_AF
   
   # estimate Ne using the specified method(s)
   res <- numeric(length=0)
-
-  #--- Nei and Tajima (1981) ---
-  #if(any(grepl("^(a1|a2|b|c)$", method))) {
-  #  corre <- 1/s0_mean + 1/st_mean
-  #  # Na1 or Na2
-  #  if(any(grepl("^a[12]$", method))) {
-  #    Fa <- (1/n)*sum(((xi-yi)^2)/(xi*(1-xi)))
-  #    # Na1
-  #    if(any(grepl("^a1$", method))) { res <- c(res, Na1=(t-2-Fa) / (2*(Fa*(1-1/(s0_mean)) - corre))) }
-  #    # Na2
-  #    if(any(grepl("^a2$", method))) { res <- c(res, Na2=(t-2) / (2*(Fa - corre))) }
-  #  }
-  #  # Nb
-  #  if(any(grepl("^b$", method))) { Fb <- (1/n)*sum(((xi-yi)^2)/(zi*(1-zi))); res <- c(res, Nb=(t-2)*(1+Fb/4) / (2*(Fb*(1-1/4*corre) - corre))) }
-  #  # Nc
-  #  if(any(grepl("^c$", method))) { Fc <- (1/n)*sum(((xi-yi)^2)/(zi-xi*yi)); res <- c(res, Nc=(t-2) / (2*(Fc - corre))) }
-  #}
   
   #--- Waples (1989) ---
-  if(any(grepl("^W_plan(I|II)$", method))) {
+  if(any(grepl("^W\\.plan(I|II)$", method))) {
     Fc <- ((xi-yi)^2)/(zi-xi*yi)
     # W_planI
-    if(any(grepl("^W_planI$", method))) {
+    if(any(grepl("^W\\.planI$", method))) {
       Fc_planI <- (1/n)*sum( Fc - (1/s0 + 1/st) + 1/Ncensus )
-      res <- c(res, Nw_planI=-t/(ploidy*log(1-Fc_planI)))
+      res <- c(res, Nw.planI=-t/(ploidy*log(1-Fc_planI)))
     }
     # W_planII
-    if(any(grepl("^W_planII$", method))) {
+    if(any(grepl("^W\\.planII$", method))) {
       Fc_planII <- (1/n)*sum( Fc - (1/s0 + 1/st))
-      res <- c(res, Nw_planII=-t/(ploidy*log(1-Fc_planII)))
+      res <- c(res, Nw.planII=-t/(ploidy*log(1-Fc_planII)))
     }
   }
   
   #--- Jorde and Ryman (2007) ---
-  if(any(grepl("^JR_plan(I|II)$", method))) {
+  if(any(grepl("^JR\\.plan(I|II)$", method))) {
     F_nom <- (xi-yi)^2
     F_denom <- zi*(1-zi)
     n_harmonic <- 1/(1/s0 + 1/st)
     # JR_planI
-    if(any(grepl("^JR_planI$", method))) {
+    if(any(grepl("^JR\\.planI$", method))) {
       Fs_planI_nom <- sum(F_nom * (1 - 1/(4*n_harmonic) + 1/(4*Ncensus)) * n_harmonic * Ncensus + F_denom * (n_harmonic - Ncensus))/sum(F_denom * n_harmonic * Ncensus)
       Fs_planI_denom <- sum((4*F_denom + F_nom) * (1 - 1/st))/sum(4*F_denom)
       Fs_planI <- Fs_planI_nom/Fs_planI_denom
-      res <- c(res, Njr_planI=-t/(ploidy*log(1-Fs_planI)))
+      res <- c(res, Njr.planI=-t/(ploidy*log(1-Fs_planI)))
     }
     # JR_planII
-    if(any(grepl("^JR_planII$", method))) { 
+    if(any(grepl("^JR\\.planII$", method))) { 
       Fs_planII_nom = sum(F_nom * (1-1/(4*n_harmonic)) * n_harmonic - F_denom )/sum( F_denom * n_harmonic )
       Fs_planII_denom = sum((4*F_denom + F_nom) * (1 - 1/st))/sum( 4*F_denom )
       Fs_planII = Fs_planII_nom/Fs_planII_denom
-      res <- c(res, Njr_planII=-t/(ploidy*log(1-Fs_planII)))
+      res <- c(res, Njr.planII=-t/(ploidy*log(1-Fs_planII)))
     }
   }
   
   #--- Andreas Futschik ---
-  if(any(grepl("^P_AF", method))) {
+  if(any(grepl("^P\\.alt", method))) {
     # set correction term for 1-step sampling (plan II)
-    if(any(grepl("^P_AF$", method))) {
+    if(any(grepl("^P\\.alt\\.1step\\.planII$", method))) {
       S <- sum(xi*(1-xi)*1/s0 + yi*(1-yi)*1/st)
       Ft <- (sum((xi-yi)^2) - S) / sum(xi*(1-xi))
-      res <- c(res, Np_af=-t/(ploidy*log(1-Ft)))
+      res <- c(res, Np.alt.1step.planII=-t/(ploidy*log(1-Ft)))
     }
     # ... 2-step sampling (plan II)
-    if(any(grepl("^P_AF2_planII$", method))) {
+    if(any(grepl("^P\\.alt\\.2step\\.planII$", method))) {
       S <- sum(xi*(1-xi)*(1/s0+1/(ploidy*poolSize[1])-1/(s0*ploidy*poolSize[1])) + yi*(1-yi)*(1/st+1/(ploidy*poolSize[2])-1/(st*ploidy*poolSize[2])))
       Ft <- (sum((xi-yi)^2) - S) / sum(xi*(1-xi))
-      res <- c(res, Np_af2_planII=-t/(ploidy*log(1-Ft)))
+      res <- c(res, Np.alt.2step.planII=-t/(ploidy*log(1-Ft)))
     }
     # ... 2-step sampling (plan I)    ----------------TODO: NCENSUS AND POOLSIZE MUST BE MULTIPLIED WITH PLOIDY------------------------
-    if(any(grepl("^P_AF2_planI$", method))) {
+    if(any(grepl("^P\\.alt\\.2step\\.planI$", method))) {
       S <- sum(xi*(1-xi)*(1/s0+1/(ploidy*poolSize[1])*(Ncensus-poolSize[1])/(Ncensus-1)-1/(s0*ploidy*poolSize[1])) + yi*(1-yi)*(1/st+1/(ploidy*poolSize[2])*(Ncensus-poolSize[2])/(Ncensus-1)-1/(st*ploidy*poolSize[2])))
       Ft <- (sum((xi-yi)^2) - S) / sum(xi*(1-xi))
-      res <- c(res, Np_af2_planI=-t/(ploidy*log(1-Ft)))
+      res <- c(res, Np.alt.2step.planI=-t/(ploidy*log(1-Ft)))
     } 
   }
   
   #--- Agnes Jonas ---
-  if(any(grepl("^P_AJ", method))) {
+  if(any(grepl("^P\\.plan", method))) {
     C0i <- 1/s0 + 1/(ploidy*poolSize[1]) - 1/(s0*ploidy*poolSize[1])
     Cti <- 1/st + 1/(ploidy*poolSize[2]) - 1/(st*ploidy*poolSize[2])
     
     # sampling plan II
-    if(any(grepl("^P_AJ_planII$", method))) {
+    if(any(grepl("^P\\.planII$", method))) {
       Ft <- sum((xi - yi)^2 - (zi-xi*yi)*( C0i + Cti )) / sum( (zi-xi*yi) * (1 - Cti))
-      res <- c(res, Np_aj2_planII=-t/(ploidy*log(1-Ft)))
+      res <- c(res, Np.planII=-t/(ploidy*log(1-Ft)))
     }
     # sampling plan I    ----------------TODO: NCENSUS MUST BE MULTIPLIED WITH PLOIDY------------------------
-    if(any(grepl("^P_AJ_planI$", method))) {
+    if(any(grepl("^P\\.planI$", method))) {
       Ft <- sum((xi - yi)^2 * (1 - 1/(ploidy*Ncensus)) - (zi-xi*yi)*( C0i + Cti - 1/Ncensus)) / sum( (zi-xi*yi) * (1 - Cti))
-      res <- c(res, Np_aj2_planI=-t/(ploidy*log(1-Ft)))
+      res <- c(res, Np.planI=-t/(ploidy*log(1-Ft)))
     }
   }
   
@@ -308,7 +302,7 @@ estimateNe <- function(p0, pt, cov0, covt, t, ploidy=2, truncAF=NA, method="P_AF
   return(res)
 }
 
-estimateWndNe <- function(chr, pos, wndSize, p0, pt, cov0, covt, t, unit=c("bp", "SNP"), ploidy=2, truncAF=NA, method="P_AF2_planI", poolSize=NA, Ncensus=NA) {
+estimateWndNe <- function(chr, pos, wndSize, p0, pt, cov0, covt, t, unit=c("bp", "SNP"), ploidy=2, truncAF=NA, method="P.planI", poolSize=NA, Ncensus=NA) {
 
   # check unit parameter
   unit <- match.arg(unit)
