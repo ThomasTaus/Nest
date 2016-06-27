@@ -157,8 +157,8 @@ read.sync <- function(file, gen, repl, rising=FALSE) {
     # calculate mean allele frequency change per SNP and replicate
     ugens <- unique(popInfo$gen)
     minGen <- min(popInfo$gen)
-    meanAf <- foreach(r=names(cntRes), .combine=cbind, .final=rowMeans) %do% {
-      foreach(t = ugens[ugens != minGen], .combine=cbind, .final=rowMeans) %do% {
+    meanAf <- foreach(r=names(cntRes), .combine=cbind, .final=function(x) { if(is.matrix(x)) return(rowMeans(x)) else return(x) }) %do% {
+      foreach(t = ugens[ugens != minGen], .combine=cbind, .final=function(x) { if(is.matrix(x)) return(rowMeans(x)) else return(x) }) %do% {
         cntRes[[r]][,paste0("F", t, "_cnt")] / cntRes[[r]][,paste0("F", t, "_cov")] - cntRes[[r]][,paste0("F", minGen, "_cnt")] / cntRes[[r]][,paste0("F", minGen, "_cov")]
       }
     }

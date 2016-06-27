@@ -1,8 +1,8 @@
 Package: Nest
 Type: Package
 Title: Simulate allele frequency trajectories and estimate effective population size 
-Version: 1.1.4
-Date: 2016-05-04
+Version: 1.1.5
+Date: 2016-06-27
 Author: Thomas Taus
 Maintainer: Thomas Taus <Thomas.Taus@vetmeduni.ac.at>
 Description: Simulate your own allele frequency time series data, load allele counts into R and estimate the effective population size with different methods.
