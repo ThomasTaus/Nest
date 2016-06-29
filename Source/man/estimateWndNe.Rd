@@ -2,13 +2,13 @@
 \alias{estimateWndNe}
 %- Also NEED an '\alias' for EACH other topic documented here.
 \title{
-Estimate Effetive Population Size for Genome-Wide Data
+Estimate Effective Population Size for Genome-Wide Data
 }
 \description{
 \code{estimateNe} splits the genome-wide data into non-overlapping windows of size \code{wndSize} and estimates for each window the effective population size (Ne) based on tempral allele frequency changes.
 }
 \usage{
-estimateWndNe(chr, pos, wndSize, p0, pt, cov0, covt, t, unit = c("bp", "SNP"), ploidy = 2, truncAF = NA, method = "P.planI", poolSize = NA, Ncensus = NA)
+estimateWndNe(chr, pos, wndSize, p0, pt, cov0, covt, t, unit = c("bp", "SNP"), ploidy = 2, truncAF = NA, method = "P.planI", Ncensus = NA, poolSize = rep(Ncensus, times = 2))
 }
 \arguments{
   \item{chr}{
@@ -47,11 +47,11 @@ numeric indicating whether SNPs with extreme allele frequencies should be exclud
   \item{method}{ 
 character vector defining the method(s) that should be used to estimate Ne. Possible values include \code{"P.planI"}, \code{"P.planII"}, \code{"JR.planI"}, \code{"JR.planII"}, \code{"W.planI"} and \code{"W.planII"}, see 'Details'.
 }
-  \item{poolSize}{
-numeric vector indicating the number of individuals pooled at the first and second time point. If the entire population has been subjected to Pool-Seq (default) then \code{poolSize = NA}.
-}
   \item{Ncensus}{
 integer specifying the census population size, which is required only if \code{method} contains planI estimators.
+}
+ \item{poolSize}{
+numeric vector of length 2 indicating the number of individuals pooled at the first and second time point. If the entire population has been subjected to Pool-seq (default) then \code{poolSize = rep(Ncensus, times=2)}, see 'Details'.
 }
 }
 \details{
@@ -62,17 +62,17 @@ In contrast, under plan II scenarios individuals are sampled before reproduction
 
 Based on these two sampling schemes for individuals, estimators suggested by Waples 1989 (\code{"W.planI"} and \code{"W.planII"}), Jorde & Ryman 2007 (\code{"JR.planI"} and \code{"JR.planII"}) and Jónás et al. (\code{"P.planI"} and \code{"P.planII"}) are implemented. The latter are specifically design for application to Pool-seq data and, unlike the others, account for the two stage sampling process associated with such data.
 
-The two sampling steps invovled in Pool-seq are: (i) individuals are drawn from the population without replacement (\code{poolSize}); (ii) reads are sampled out of the DNA pool (\code{cov0} and \code{covt}).
+The two sampling steps invovled in Pool-seq are: (i) individuals are drawn from the population without replacement (\code{poolSize}); (ii) reads are sampled out of the DNA pool (\code{cov0} and \code{covt}). Please note that all two-step sampling estimators require \code{poolSize} to be specified and unequal to \code{NA}.
 
 In addition to the estimators mentioned above, Andreas Futschik suggested alternative estimators for one-step sampling (\code{"P.alt.1step.planII"}) and two-step sampling (\code{"P.alt.2step.planI"} and \code{"P.alt.2step.planII"}) that can be applied to Pool-seq data.
 }
 \value{
 \code{estimateWndNe} returns an object of type \code{data.table} that contains Ne estimates for all windows of each chromosome using the method(s) specified in \code{method}. The resulting \code{data.table} contains the following columns:
-  \item{Nx}{Ne estimate for the current window using method x, see 'Details'}
-  \item{chr}{chromosome name}
+  \item{Nx}{Ne estimate for the current window using method x, see 'Details'.}
+  \item{chr}{chromosome name.}
   \item{wndStart}{}
-  \item{wndStop}{start/stop position of the current window}
-  \item{SNPs}{number of SNPs within the window}
+  \item{wndStop}{start/stop position of the current window.}
+  \item{SNPs}{number of SNPs within the window.}
 }
 \references{
 Waples R. S.: A generalized approach for estimating effective population size from temporal changes in allele frequency, \emph{Genetics} \bold{1989}, 121, 379–391.

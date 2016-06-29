@@ -2,13 +2,13 @@
 \alias{estimateNe}
 %- Also NEED an '\alias' for EACH other topic documented here.
 \title{
-Estimate Effetive Population Size
+Estimate Effective Population Size
 }
 \description{
 \code{estimateNe} estimates the effective population size (Ne) based on tempral allele frequency changes.
 }
 \usage{
-estimateNe(p0, pt, cov0, covt, t, ploidy = 2, truncAF = NA, method = "P.planI", poolSize = NA, Ncensus = NA, asList = FALSE)
+estimateNe(p0, pt, cov0, covt, t, ploidy = 2, truncAF = NA, method = "P.planI", Ncensus = NA, poolSize = rep(Ncensus, times = 2), asList = FALSE)
 }
 %- maybe also 'usage' for other objects documented here.
 \arguments{
@@ -36,11 +36,11 @@ numeric indicating whether SNPs with extreme allele frequencies should be exclud
   \item{method}{ 
 character vector defining the method(s) that should be used to estimate Ne. Possible values include \code{"P.planI"}, \code{"P.planII"}, \code{"JR.planI"}, \code{"JR.planII"}, \code{"W.planI"} and \code{"W.planII"}, see 'Details'.
 }
-  \item{poolSize}{
-numeric vector indicating the number of individuals pooled at the first and second time point. If the entire population has been subjected to Pool-seq (default) then \code{poolSize = NA}.
-}
   \item{Ncensus}{
 integer specifying the census population size, which is required only if \code{method} contains planI estimators.
+}
+  \item{poolSize}{
+numeric vector of length 2 indicating the number of individuals pooled at the first and second time point. If the entire population has been subjected to Pool-seq (default) then \code{poolSize = rep(Ncensus, times=2)}, see 'Details'.
 }
   \item{asList}{
 logical asking whether the estimates should be returned as a list. By default (\code{asList = FALSE}) a named vector is returned.
@@ -54,7 +54,7 @@ In contrast, under plan II scenarios individuals are sampled before reproduction
 
 Based on these two sampling schemes for individuals, estimators suggested by Waples 1989 (\code{"W.planI"} and \code{"W.planII"}), Jorde & Ryman 2007 (\code{"JR.planI"} and \code{"JR.planII"}) and Jónás et al. (\code{"P.planI"} and \code{"P.planII"}) are implemented. The latter are specifically design for application to Pool-seq data and, unlike the others, account for the two stage sampling process associated with such data.
 
-The two sampling steps invovled in Pool-seq are: (i) individuals are drawn from the population without replacement (\code{poolSize}); (ii) reads are sampled out of the DNA pool (\code{cov0} and \code{covt}).
+The two sampling steps invovled in Pool-seq are: (i) individuals are drawn from the population without replacement (\code{poolSize}); (ii) reads are sampled out of the DNA pool (\code{cov0} and \code{covt}). Please note that all two-step sampling estimators require \code{poolSize} to be specified and unequal to \code{NA}.
 
 In addition to the estimators mentioned above, Andreas Futschik suggested alternative estimators for one-step sampling (\code{"P.alt.1step.planII"}) and two-step sampling (\code{"P.alt.2step.planI"} and \code{"P.alt.2step.planII"}) that can be applied to Pool-seq data.
 }
@@ -83,7 +83,7 @@ Thomas Taus & Ágnes Jónás
 \examples{
 # simulate allele frequency trajectories of individual loci using the Wright-Fisher model
 Ne <- 1000
-alleleFreqs <- wf.traj(p0=runif(10000, 0, 1), Ne=2*Ne, t=c(0, 10, 20))
+alleleFreqs <- wf.traj(p0=runif(10000, 0, 1), Ne=Ne, t=c(0, 10, 20))
 head(alleleFreqs)
 
 # introduce sampling error to mimic Pool-seq data

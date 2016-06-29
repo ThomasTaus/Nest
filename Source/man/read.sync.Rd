@@ -5,7 +5,7 @@
 Read Sync-File Format
 }
 \description{
-Reads a synchronized file generated e.g. by the \href{http://sourceforge.net/projects/popoolation2/}{Popoolation2} software and extracts biallelic count data.
+Reads a synchronized file generated e.g. by the \href{http://sourceforge.net/projects/popoolation2/}{Popoolation2} software and extracts biallelic count data. Allele frequencies are polarized either by the minor or the rising allele.
 }
 \usage{
 read.sync(file, gen, repl, rising = FALSE)
@@ -28,10 +28,7 @@ a logical value. If \code{FALSE} (default) allele counts are polarized for the m
 MISSING
 }
 \value{
-A list containing the following items:
-  \item{chr}{named vector containing ID and name of each chromosome in the sync-file.}
-  \item{alleles}{\code{data.table} that contains major and minor allele for each genome position.}
-  \item{cnts}{list of numeric matrices with allele frequency count data, one matrix for each replicate (as specified in \code{repl}). Each matrix contains the chromosome ID (\code{chrID}), sequence position (\code{pos}), biallelic minor allele count (\code{Fx_cnt}) and sequence coverage (\code{Fx_cov}) for each SNP (and generation x). The format of this object is similar to the one returned by \code{\link{wf.traj}()}.}
+\code{read.sync} returns an object of class \code{sync}. Allelic information, allele frequencies and sequence coverages can be accessed with various functions including \code{\link{af.traj}}, \code{\link{af}} and \code{\link{coverage}}
 }
 \references{
 %% ~put references to the literature/web site here ~
@@ -46,10 +43,10 @@ Thomas Taus
 %% ~Make other sections like Warning with \section{Warning }{....} ~
 
 \seealso{
-%% ~~objects to See Also as \code{\link{help}}, ~~~
+\code{\link{af.traj}}, \code{\link{af}} and \code{\link{coverage}}
 }
 \examples{
-#MISSING: include example dataset (returned after reading small sync file)
+#MISSING
 }
 % Add one or more standard keywords, see file 'KEYWORDS' in the
 % R documentation directory.
