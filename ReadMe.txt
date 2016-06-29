@@ -23,7 +23,7 @@ If we can later submit it to CRAN, all the dependent packages will be installed 
  --------------
 Click on ‘Clone or download’ to download the whole project (e.g. as ZIP). You will find the most recent version in the folder 'Release’. To install Nest run the following line in an R-session:
 
-install.packages("/Path/To/Nest_1.1.5.tar.gz", repos=NULL, type="source")
+install.packages("/Path/To/Nest_<version>.tar.gz", repos=NULL, type="source")
 
 
  -------
