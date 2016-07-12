@@ -42,7 +42,7 @@ Thomas Taus
 %% ~Make other sections like Warning with \section{Warning }{....} ~
 
 \seealso{
-\code{\link{af}} and \code{\link{coverage}}
+\code{\link{af}} and \code{\link{coverage}}.
 }
 \examples{
 }

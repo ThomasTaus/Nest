@@ -28,7 +28,7 @@ numeric indicating whether SNPs with extreme allele frequencies should be exclud
 }
 }
 \details{
-Alleles that start from a frequency of \code{0} or \code{1}, or those that do not change between the two sampling time points (\code{p0 == pt}) are not informative for Ne estimation and \code{checkSNP} will return \code{FALSE} for those ones. Similarly positions with a sequencing coverage of 0 will be masked, and \code{checkSNP} will return \code{FALSE}.
+Alleles that start from a frequency of \code{0} or \code{1} are not informative for Ne estimation and \code{checkSNP} will return \code{FALSE} for those ones. Similarly positions with a sequencing coverage of 0 will be masked, and \code{checkSNP} will return \code{FALSE}.
 
 Extreme allele frequencies, which are close to \code{0} or \code{1}, increase the variance of Ne estimates and it might therefor be advantageous not to consider them for Ne estimation. The parameter \code{truncAF} can be used for this purpose.
 }

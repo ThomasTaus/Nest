@@ -1,7 +1,7 @@
 Package: Nest
 Type: Package
 Title: Simulate allele frequency trajectories and estimate effective population size 
-Version: 1.1.7
+Version: 1.1.8
 Date: 2016-07-12
 Author: Thomas Taus
 Maintainer: Thomas Taus <Thomas.Taus@vetmeduni.ac.at>

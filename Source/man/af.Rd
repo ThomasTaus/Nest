@@ -39,7 +39,7 @@ Thomas Taus
 %% ~Make other sections like Warning with \section{Warning }{....} ~
 
 \seealso{
-\code{\link{af.traj}} and \code{\link{coverage}}
+\code{\link{af.traj}}, \code{\link{coverage}} and \code{\link{splitLocusID}}.
 }
 \examples{
 

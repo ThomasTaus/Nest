@@ -365,9 +365,9 @@ read.sync <- function(file, gen, repl, rising=FALSE) {
 #--------------------------------------
 
 checkSNP <- function(p0, pt, cov0, covt, truncAF=NA) {
-  # return false if any of the following conditions is met xi==yi, xi==0, xi==1, (xi+yi)/2==0, (xi+yi)/2==1
-  # return for extreme allele frequencies if truncAF is unequal to 'NA'
-  return(p0 != pt & p0 != 0 & p0 != 1 & cov0 != 0 & covt != 0 & if(is.na(truncAF)) TRUE else p0 >= truncAF & p0 <= 1-truncAF)
+  # return false if any of the following conditions is met: xi==0, xi==1
+  # mask extreme allele frequencies if truncAF is unequal to 'NA'
+  return(p0 != 0 & p0 != 1 & cov0 != 0 & covt != 0 & if(is.na(truncAF)) TRUE else p0 >= truncAF & p0 <= 1-truncAF)
 }
 
 estimateNe <- function(p0, pt, cov0, covt, t, ploidy=2, truncAF=NA, method="P.planI", Ncensus=NA, poolSize=rep(Ncensus, times=2), asList=FALSE) { 

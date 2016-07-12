@@ -40,7 +40,7 @@ a \code{sync} object.
 %% ~Make other sections like Warning with \section{Warning }{....} ~
 
 \seealso{
-\code{\link{af}} and \code{\link{af.traj}}
+\code{\link{af}} and \code{\link{af.traj}}.
 }
 \examples{
 
