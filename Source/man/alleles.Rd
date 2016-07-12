@@ -19,7 +19,7 @@ a \code{sync} object.
 \details{
 }
 \value{
-\code{alleles} returns a \code{\link{data.table}} containing information for each genomic locus in \code{sync}.
+\code{alleles} returns a \code{\link{data.table}} containing information for each genomic locus in \code{sync}. Please note that the order of genomic loci in the sync-file is not preserved. The returned \code{data.table} provides the following columns:
 \item{chr}{chromosome name.}
 \item{pos}{sequence position.}
 \item{ref}{reference allele.}

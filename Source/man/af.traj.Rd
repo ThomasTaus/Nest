@@ -5,7 +5,7 @@
 Allele frequency trajectories
 }
 \description{
-Extract allele frequency trajectories from a \code{sync} object.
+Extract allele frequency trajectories of specific genomic loci from a \code{sync} object.
 }
 \usage{
 af.traj(sync, chr, pos, repl)

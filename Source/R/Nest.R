@@ -224,7 +224,7 @@ af <- function(sync, repl, gen) {
   afMat <- as.matrix(subAlleles)
   rownames(afMat) <- sync@alleles$posID
   
-  return(afMat)
+  return(afMat[order(sync@alleles$chr, sync@alleles$pos),])
 }
 
 coverage <- function(sync, repl, gen) {
@@ -240,7 +240,7 @@ coverage <- function(sync, repl, gen) {
   afMat <- as.matrix(subAlleles)
   rownames(afMat) <- sync@alleles$posID
   
-  return(afMat)
+  return(afMat[order(sync@alleles$chr, sync@alleles$pos),])
 }
 
 alleles <- function(sync) {
@@ -250,6 +250,16 @@ alleles <- function(sync) {
   
   return(sync@alleles[order(chr, pos),1:6,with=FALSE])
 }
+
+splitLocusID <- function(id, sep=".") {
+  splitMat <- stri_split(id <- as.character(id), fixed=(sep <- as.character(sep)), simplify=TRUE)
+  
+  if(!is.matrix(splitMat) || dim(splitMat)[1] != length(id) || dim(splitMat)[2] != 2)
+    stop("Locus IDs could not be split successfully.")
+  
+  return(data.table(chr=splitMat[,1], pos=as.numeric(splitMat[,2])))
+}
+
 
 #----------------------------------------------------
 # Convert Sync-file to allele frequency data object -

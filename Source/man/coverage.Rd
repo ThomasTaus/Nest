@@ -25,7 +25,7 @@ numeric vector indicating the generation(s).
 \details{
 }
 \value{
-\code{coverage} returns a matrix of sequence coverages for the replicates \code{repl} and generations \code{gen} specified. Rows and columns correspond to genomic loci and replicate-generation pairs, respectively.
+\code{coverage} returns a matrix of sequence coverages for the replicates \code{repl} and generations \code{gen} specified. Rows and columns correspond to genomic loci and replicate-generation pairs, respectively. Please note that the order of genomic loci in the sync-file is not preserved.
 }
 \references{
 }
