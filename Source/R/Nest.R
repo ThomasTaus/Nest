@@ -513,7 +513,7 @@ estimateWndNe <- function(chr, pos, wndSize, p0, pt, cov0, covt, t, unit=c("bp",
     wndRes[,c("chr", "wndStart", "wndStop", "SNPs"):=list(cc,
                                                           switch(unit, bp=1+(wndID-1)*wndSize, SNP=wndMinMax$min[wndRes$wndID]),
                                                           switch(unit, bp=wndID*wndSize, SNP=wndMinMax$max[wndRes$wndID]),
-                                                          table(dataSubDt$wndID)[as.character(wndRes$wndID)])]
+                                                          as.integer(table(dataSubDt$wndID)[as.character(wndRes$wndID)]))]
     
     return(wndRes[,!grepl("^wndID$", colnames(wndRes)),with=FALSE])
   } )
