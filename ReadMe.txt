@@ -4,6 +4,8 @@
 
 It is an R-package that allows you to simulate allele frequency trajectories (under neutrality and with selection) and estimate the effective population size (Ne). You can also load sync-files in R and polarize allele frequencies (e.g. for the rising allele).
 
+PLEASE NOTE: All functions of the Nest package are also available in the poolSeq package (https://github.com/ThomasTaus/poolSeq), which provides additional functionality. It is therefor recommended to use poolSeq instead of Nest.
+
 
  ---------------
 | Prerequisites |
